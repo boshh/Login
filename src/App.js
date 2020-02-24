@@ -1,50 +1,22 @@
 import React, { Component } from 'react';
-// import logo from './logo.svg';
+
 import './App.css';
 
 import { BrowserRouter as Router, Route, Link, Redirect, withRouter } from "react-router-dom";
 
 import Welcome from './Welcome'
-// import Example from './SignIn'
 
-import {connect} from 'react-redux'
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
 
 import { Form, Field } from 'react-final-form'
 
-import { loginRequest, loginCancel } from './actions/login.js'
-// import { isImport } from '@babel/types';
-// import rootSaga from './sagas/index.js'
+import { loginRequest } from './actions/login.js'
 
-// import { createStore, applyMiddleware } from 'redux'
-
-// import createSagaMiddleware from 'redux-saga'
-// import rootReducer from './reducers/index.js'
-
-// const sagaMiddleware = createSagaMiddleware()
-
-// const store = createStore(
-//   rootReducer,
-//   applyMiddleware(sagaMiddleware)
-// )
-// sagaMiddleware.run(rootSaga)
-
-
-
-// const sagaMiddleware = createSagaMiddleware()
-
-
-// const store = createStore(
-//   rootReducer
-//   ,applyMiddleware(sagaMiddleware))
-
-// sagaMiddleware.run(rootSaga)
-
-// const action = type => store.dispatch({type})
 
 function App() {
   return (
+    // 設定路由
     <Router>
       <div>
         <Header />
@@ -59,9 +31,10 @@ function App() {
 
 function Header() {
   return (
+    // 左側選單
     <div style={{margin:'10px 10px',  float: 'left'}}> 
       <AuthButton />
-      <div>
+      <div style={{border:'1px solid black'}}>
         <ul>
           <li>
             <Link to="/">Public Page</Link>
@@ -91,10 +64,10 @@ const fakeAuth = {
   }
 };
 
+//要求要登入後權限才能看到的頁面
 function PrivateRoute({ component: Component, ...rest }) {
   return (
-    <Route
-      {...rest}
+    <Route {...rest}
       render={props =>
         fakeAuth.isAuthenticated ? (
           <Component {...props} />
@@ -111,7 +84,7 @@ function PrivateRoute({ component: Component, ...rest }) {
   );
 }
 
-
+//定義登出按鈕 如果登入權限則顯示登出按鈕並呈現welcome字樣
 const AuthButton = withRouter(
   ({ history }) =>
     fakeAuth.isAuthenticated ? (
@@ -131,10 +104,11 @@ const AuthButton = withRouter(
 );
 
 
-
+// 登入元件
 class Login extends React.Component {
 
   state = { show: false, redirectToReferrer: false, loginFail: false }
+  loginName ={name:''}
 
   handleClose = () => {
     this.setState({ show: false, redirectToReferrer: false, loginFail: false });
@@ -144,6 +118,7 @@ class Login extends React.Component {
     this.setState({ show: true });
   }
 
+  // 建立登入頁面驗證
   validates = (values) => {
     const errors = {};
     if (!values.username) {
@@ -160,24 +135,16 @@ class Login extends React.Component {
     return errors;
   }
 
+  //  定義protect頁面 並顯示登入popup視窗 帳密：guest
   render() {
     let { from } = { from: { pathname: "/protected" } };
     let { redirectToReferrer } = this.state;
 
     
     const required = value => (value ? undefined : 'Required')
-    // const { login, dispatch } = this.props
-    // const sendLoginRequest = ({ username, password }) => store.dispatch(loginRequest({ username, password }))
-
 
     const handleLogin = (values) => {
-      // sendLoginRequest({ username: values.username, password: values.password })
-      // const sendLoginRequest = ({ username, password }) => store.dispatch(loginRequest({ username, password }))
-      // sendLoginRequest({ username: values.username, password: values.password })
-      // const { login, dispatch } = this.props
-      // const sendLoginRequest = ({ username, password }) => dispatch(loginRequest({ username, password }))
-  
-      // sendLoginRequest({ username: values.username, password: values.password })
+
       loginRequest({username: values.username, password: values.password})
       if (values.username === 'guest' && values.password === 'guest') {
         this.setState({ loginFail: false })
@@ -190,19 +157,16 @@ class Login extends React.Component {
       }
     }
 
-
-
     if (redirectToReferrer) return <Redirect to={from} />;
 
     return (
       <>
-        <p>You must log in to view the page at {from.pathname}</p>
+        <p>You must login to view the page at {from.pathname}</p>
         <Button onClick={this.handleShow}> Login</Button>
 
         <Modal show={this.state.show} onHide={this.handleClose}>
           <Form
             onSubmit={handleLogin}
-
             render={({ dirtyFields, errors, handleSubmit, submitting, touched, valid, values }) => (
               <form onSubmit={handleSubmit}>
                 <Modal.Header closeButton>
@@ -243,13 +207,6 @@ class Login extends React.Component {
   }
 
 }
-
-// function mapStateToProps(state, ownProps) {
-//   const {login} = state
-//   return {login}
-// }
-
-// export default connect(mapStateToProps)(App)
 
 
 export default App;
